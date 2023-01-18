@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
 // define your constants here
 #define STATS 4
@@ -38,6 +40,9 @@ int main(void) {
     int stats = 20; 
     bool valid = false; 
 
+    printf("Let's create a pokemon!\n");
+    printf("You have 20 points dedicated to spread across your pokemon's HP, ATT and DEF\n");
+
     // Scan hp of starter pokemon
     while (!valid) { // valid == false
         printf("You have %d stat points remaining.\n", stats);
@@ -45,6 +50,8 @@ int main(void) {
         scanf("%d", &own[INDEX_HP]);
         if (own[INDEX_HP] > stats) {
             printf("You cannot use more than your given stat points\n\n");
+        } else if (own[INDEX_HP] <= 0) {
+            printf("Invalid number!");
         } else {
             stats -= own[INDEX_HP];
             valid = true;
@@ -59,6 +66,8 @@ int main(void) {
         scanf("%d", &own[INDEX_ATT]);
         if (own[INDEX_ATT] > stats) {
             printf("You cannot use more than your given stat points\n\n");
+        } else if (own[INDEX_ATT] <= 0) {
+            printf("Invalid number!");
         } else {
             stats -= own[INDEX_ATT];
             valid = true;
@@ -73,6 +82,8 @@ int main(void) {
         scanf("%d", &own[INDEX_DEF]);
         if (own[INDEX_DEF] > stats) {
             printf("You cannot use more than your given stat points\n\n");
+        } else if (own[INDEX_DEF] <= 0) {
+            printf("Invalid number!");
         } else {
             stats -= own[INDEX_DEF];
             valid = true;
@@ -106,86 +117,38 @@ int main(void) {
     }
     
     // Ask user for number of potions to start with
+    valid = false; 
     int potions;
-    printf("How many potions do you have: ");
-    scanf("%d", &potions);
+    while (!valid) {
+        printf("How many potions do you have? (max 5): ");
+        scanf("%d", &potions);
+        if (potions > 5) {
+            printf("You cannot have more than 5 potions!\n");
+        } else if (potions < 0) {
+            printf("You cannot have a negative number of potions!\n");
+        } else {
+            valid = true; 
+        }
+    }
 
     // Create opponent pokemon
     int opp[STATS];
     stats = 20; 
     valid = false; 
 
-    // Scan hp of opponent pokemon
-    while (!valid) { // valid == false
-        printf("You have %d stat points remaining.\n", stats);
-        printf("Please enter the HEALTH of your opponent pokemon: ");
-        scanf("%d", &opp[INDEX_HP]);
-        if (opp[INDEX_HP] > stats) {
-            printf("You cannot use more than your given stat points\n\n");
-        } else {
-            stats -= opp[INDEX_HP];
-            valid = true;
-        }
-    }
-
-    // scan att of opponent pokemon
-    valid = false;
-    while (!valid) { // valid == false
-        printf("You have %d stat points remaining.\n", stats);
-        printf("Please enter the ATTACK of your opponent pokemon: ");
-        scanf("%d", &opp[INDEX_ATT]);
-        if (opp[INDEX_ATT] > stats) {
-            printf("You cannot use more than your given stat points\n\n");
-        } else {
-            stats -= opp[INDEX_ATT];
-            valid = true;
-        }
-    }
-
-    // scan def of opponent pokemon
-    valid = false;
-    while (!valid) { // valid == false
-        printf("You have %d stat points remaining.\n", stats);
-        printf("Please enter the DEFENCE of your opponent pokemon: ");
-        scanf("%d", &opp[INDEX_DEF]);
-        if (opp[INDEX_DEF] > stats) {
-            printf("You cannot use more than your given stat points\n\n");
-        } else {
-            stats -= opp[INDEX_DEF];
-            valid = true;
-        }
-    }
-
-    // Scan for type of pokemon
-    printf("\nValid types: \n");
-    printf("[%c]: FIRE type\n", TYPE_FIRE);
-    printf("[%c]: WATER type\n", TYPE_WATER);
-    printf("[%c]: GRASS type\n", TYPE_GRASS);
-
-    valid = false;
-    while (!valid) {
-        printf("Please enter the TYPE of your opponent pokemon: ");
-        scanf(" %c", &type);
-        if (type == TYPE_FIRE || type == TYPE_GRASS || type == TYPE_WATER) {
-            valid = true;
-        } else {
-            printf("Invalid type entered!\n\n");
-        }
-    }
-
-    if (type == TYPE_FIRE) {
-        opp[INDEX_TYPE] = FIRE_VALUE;
-    } else if (type == TYPE_WATER) {
-        opp[INDEX_TYPE] = WATER_VALUE;
-    } else {
-        opp[INDEX_TYPE] = GRASS_VALUE;
-    }
+    srand(time(0));
+    opp[INDEX_HP] = rand() % stats;
+    stats -= opp[INDEX_HP];
+    opp[INDEX_ATT] = rand() % stats;
+    stats -= opp[INDEX_ATT];
+    opp[INDEX_DEF] = stats;
+    opp[INDEX_TYPE] = rand() % 3 + 1;
 
     // Print current pokemon details
     printf("Your pokemon: \n");
-    printf("HP:  %d\n", own[INDEX_HP]);
-    printf("ATT: %d\n", own[INDEX_ATT]);
-    printf("DEF: %d\n", own[INDEX_DEF]);
+    printf("HP:  %d\n", opp[INDEX_HP]);
+    printf("ATT: %d\n", opp[INDEX_ATT]);
+    printf("DEF: %d\n", opp[INDEX_DEF]);
     printf("TYPE: ");
     if (own[INDEX_TYPE] == FIRE_VALUE) {
         printf("FIRE\n");
@@ -249,6 +212,7 @@ int main(void) {
     printf("[%c]: CHECK your opponent's stats!\n", CMD_OPP);
     printf("[%c]: VIEW valid commands!\n", CMD_CMDS);
     printf("Please enter a command: ");
+
     char cmd;
     bool lost = false;
     while (scanf(" %c", &cmd) != EOF && !lost) {
