@@ -171,8 +171,8 @@ int main(void) {
     printf("\n");
 
     // Calculate advantageous types
-    // dmg_dealt = adv * (own_att - opp_def) 
-    // dmg_taken = 1 / adv * (opp_att - own_def)
+    // dmg_dealt = adv * (own_att / opp_def) + 1;
+    // dmg_taken = 1 / adv * (opp_att / own_def) + 1;
     double adv = 1.0;
     if (starters[curr_pokemon][INDEX_TYPE] == FIRE_VALUE) {
         if (opponents[curr_opponent][INDEX_TYPE] == GRASS_VALUE) {
@@ -387,7 +387,7 @@ int main(void) {
             printf("\n");
         
             
-            // Invalid Command 
+            // Check Commands
         } else if (cmd == CMD_CMDS) {
             printf("Valid commands:\n");
             printf("[%c]: ATTACK the opponent!\n", CMD_ATK);
