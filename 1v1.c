@@ -74,21 +74,8 @@ int main(void) {
         }
     }
 
-    // scan def of starter pokemon
-    valid = false;
-    while (!valid) { // valid == false
-        printf("You have %d stat points remaining.\n", stats);
-        printf("Please enter the DEFENCE of your starter pokemon: ");
-        scanf("%d", &own[INDEX_DEF]);
-        if (own[INDEX_DEF] > stats) {
-            printf("You cannot use more than your given stat points\n\n");
-        } else if (own[INDEX_DEF] <= 0) {
-            printf("Invalid number!");
-        } else {
-            stats -= own[INDEX_DEF];
-            valid = true;
-        }
-    }
+    // Assign def of starter pokemon
+    own[INDEX_DEF] = stats;
 
     // Scan for type of pokemon
     printf("\nValid types: \n");
