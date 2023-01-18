@@ -5,11 +5,12 @@
 
 // define your constants here
 #define STATS 4
-#define OPPONENT_NUM 3
+#define OPP_STATS 5
 #define INDEX_HP 0
 #define INDEX_ATT 1
 #define INDEX_DEF 2
 #define INDEX_TYPE 3
+#define INDEX_STATUS 4
 
 #define TYPE_FIRE 'f'
 #define TYPE_WATER 'w'
@@ -17,6 +18,16 @@
 #define FIRE_VALUE 1
 #define WATER_VALUE 2
 #define GRASS_VALUE 3
+
+#define MOVE_ATT 1
+#define MOVE_ICE 2
+#define MOVE_POI 3
+#define MOVE_SIN 4
+
+#define STATUS_NOR 0
+#define STATUS_FRO 1
+#define STATUS_POI 2
+#define STATUS_SLE 3
 
 #define CMD_ATK 'a'
 #define CMD_HEAL 'h'
@@ -75,6 +86,7 @@ int main(void) {
     }
 
     // Assign def of starter pokemon
+    printf("The remaining stats will be assigned to your pokemon's defence!\n");
     own[INDEX_DEF] = stats;
 
     // Scan for type of pokemon
@@ -107,7 +119,7 @@ int main(void) {
     valid = false; 
     int potions;
     while (!valid) {
-        printf("How many potions do you have? (max 5): ");
+        printf("\nHow many potions do you have? (max 5): ");
         scanf("%d", &potions);
         if (potions > 5) {
             printf("You cannot have more than 5 potions!\n");
@@ -119,7 +131,10 @@ int main(void) {
     }
 
     // Create opponent pokemon
-    int opp[STATS];
+    int opp[OPP_STATS];
+    int frozen = 0; 
+    int poisoned = 0; 
+    int sleeping = 0; 
     stats = 20; 
     valid = false; 
 
@@ -130,8 +145,10 @@ int main(void) {
     stats -= opp[INDEX_ATT];
     opp[INDEX_DEF] = stats;
     opp[INDEX_TYPE] = rand() % 3 + 1;
+    opp[INDEX_STATUS] = STATUS_NOR;
 
     // Print current pokemon details
+    printf("\n========================================\n");
     printf("Your pokemon: \n");
     printf("HP:  %d\n", opp[INDEX_HP]);
     printf("ATT: %d\n", opp[INDEX_ATT]);
@@ -144,9 +161,10 @@ int main(void) {
     } else {
         printf("GRASS\n");
     }
-    printf("\n");
+    printf("========================================\n");
 
     // Print opponent's stats
+    printf("\n========================================\n");
     printf("Opposing pokemon: \n");
     printf("HP:  %d\n", opp[INDEX_HP]);
     printf("ATT: %d\n", opp[INDEX_ATT]);
@@ -159,7 +177,7 @@ int main(void) {
     } else {
         printf("GRASS\n");
     }
-    printf("\n");
+    printf("========================================\n\n");
 
     // Calculate advantageous types
     // dmg_dealt = adv * (own_att / opp_def) + 1;
@@ -188,16 +206,13 @@ int main(void) {
     int dmg_dealt = adv * (own[INDEX_ATT] / opp[INDEX_DEF]) + 1;
     int dmg_taken = 1 / adv * (opp[INDEX_ATT] / own[INDEX_DEF]) + 1;
 
-    printf("dealt: %d\n" , dmg_dealt);
-    printf("taken: %d\n" , dmg_taken);
-
     // Scan commands
     printf("Valid commands:\n");
     printf("[%c]: ATTACK the opponent!\n", CMD_ATK);
     printf("[%c]: HEAL your pokemon by using a potion!\n", CMD_HEAL);
     printf("[%c]: CHECK your pokemon's stats!\n", CMD_STATS);
     printf("[%c]: CHECK your opponent's stats!\n", CMD_OPP);
-    printf("[%c]: VIEW valid commands!\n", CMD_CMDS);
+    printf("[%c]: VIEW commands!\n\n", CMD_CMDS);
     printf("Please enter a command: ");
 
     char cmd;
@@ -205,15 +220,75 @@ int main(void) {
     while (scanf(" %c", &cmd) != EOF && !lost) {
         // Attack the opponent
         if (cmd == CMD_ATK) {
-            opp[INDEX_HP] -= dmg_dealt;
-            printf("You attack the opponent! Opposing pokemon now has %d HP!\n", opp[INDEX_HP]);
-            if (opp[INDEX_HP] <= 0) {
-                printf("Opponent has fainted!\n");
-                printf("CONGRATULATIONS!! YOU HAVE DEFEATED ALL OF YOUR OPPONENTS!!\n");
-                printf("YOU ARE NOW THE NEW POKEMON CHAMPION!!\n");
-                return 0;
+            int move;             
+            bool valid_move = false; 
+            while (!valid_move) {
+                // List valid moves 
+                printf("\nWhich move do you use?\n");
+                printf("[%d]: ", MOVE_ATT);
+                if (own[INDEX_TYPE] == FIRE_VALUE) {
+                    printf("Flamethrower - The foe is scorched with intense flames\n");
+                } else if (own[INDEX_TYPE] == WATER_VALUE) {
+                    printf("Bubble Beam - A spray of bubbles is forcefully ejected at the foe\n");
+                } else {
+                    printf("Vine Whip - Strikes the target with slender, whiplike vines\n");
+                }
+
+                printf("[%d]: Ice Beam - Chance to FREEZE opponent\n", MOVE_ICE);
+                printf("[%d]: Poison Gas - Envelops the target in a toxic gas that may poison\n", MOVE_POI);
+                printf("[%d]: Sing - A soothing song lulls the foe into a deep slumber\n", MOVE_SIN);
+
+                // Scan for move 
+                printf("Enter a number (1-4): ");
+                scanf("%d", &move);
+                if (move == MOVE_ATT) {
+                    valid_move = true; 
+                    opp[INDEX_HP] -= dmg_dealt;
+                    printf("You attack the opponent! Opposing pokemon now has %d HP!\n\n", opp[INDEX_HP]);
+                    if (opp[INDEX_HP] <= 0) {
+                        printf("Opponent has fainted!\n");
+                        printf("CONGRATULATIONS!! YOU HAVE DEFEATED ALL OF YOUR OPPONENTS!!\n");
+                        printf("YOU ARE NOW THE NEW POKEMON CHAMPION!!\n");
+                        return 0;
+                    }
+                } else if (move == MOVE_ICE) {
+                    printf("Your pokemon used Ice Beam!\n");
+                    valid_move = true; 
+                    int chance = rand() % 5;
+                    if (chance == 0) {
+                        printf("HIT! The opposing pokemon is now frozen!\n\n");
+                        frozen = 3; 
+                        opp[INDEX_STATUS] = STATUS_FRO;
+                    } else {
+                        printf("MISSED!\n\n");
+                    }
+                } else if (move == MOVE_POI) {
+                    printf("Your pokemon used Poison Gas!\n");
+                    valid_move = true; 
+                    int chance = rand() % 3;
+                    if (chance == 0) {
+                        printf("HIT! The opposing pokemon is now poisoned!\n\n");
+                        poisoned = 4; 
+                        opp[INDEX_STATUS] = STATUS_POI;
+                    } else {
+                        printf("MISSED!\n\n");
+                    }
+                } else if (move == MOVE_SIN) {
+                    printf("Your pokemon used Sing!\n");
+                    valid_move = true; 
+                    int chance = rand() % 6;
+                    if (chance == 0) {
+                        printf("HIT! The opposing pokemon is now asleep!\n\n");
+                        sleeping = 5; 
+                        opp[INDEX_STATUS] = STATUS_SLE;
+                    } else {
+                        printf("MISSED!\n\n");
+                    }
+                } else {
+                    printf("Invalid input!\n");
+                }
             }
-             
+
             // Heal the user's pokemon
         } else if (cmd == CMD_HEAL) {
             if (potions > 0) {
@@ -221,15 +296,15 @@ int main(void) {
                 potions--; // potions = potions - 1;
                 own[INDEX_HP] += 5; // own[INDEX_HP] = own[INDEX_HP] + 5;
                 printf("Potion used! You currently have %d potions left!\n", potions);
-                printf("Your current pokemon has %d hp!\n", own[INDEX_HP]);
+                printf("Your pokemon currently has %d hp!\n\n", own[INDEX_HP]);
 
             } else {
-                printf("You have no more potions left!\n");
+                printf("You have no more potions left!\n\n");
             }
 
-            // Check party stats
+            // Check pokemon stats
         } else if (cmd == CMD_STATS) {
-            printf("========================================\n");
+            printf("\n========================================\n");
             printf("Your Pokemon:\n");
             printf("HP:  %d\n", own[INDEX_HP]);
             printf("ATT: %d\n", own[INDEX_ATT]);
@@ -247,8 +322,8 @@ int main(void) {
 
             // Check opponent's stats
         } else if (cmd == CMD_OPP) {
-            printf("========================================\n");
-            printf("Opposing pokemon: \n?");
+            printf("\n========================================\n");
+            printf("Opposing pokemon: \n");
             printf("HP:  %d\n", opp[INDEX_HP]);
             printf("ATT: %d\n", opp[INDEX_ATT]);
             printf("DEF: %d\n", opp[INDEX_DEF]);
@@ -260,31 +335,78 @@ int main(void) {
             } else {
                 printf("GRASS\n");
             }
+            printf("STATUS: ");
+            if (opp[INDEX_STATUS] == STATUS_FRO) {
+                printf("FROZEN\n");
+            } else if (opp[INDEX_STATUS] == STATUS_POI) {
+                printf("POISONED\n");
+            } else if (opp[INDEX_STATUS] == STATUS_SLE) {
+                printf("SLEEPING\n");
+            } else {
+                printf("NORMAL\n");
+            }
             printf("========================================\n");
             printf("\n");
         
             // Check Commands
         } else if (cmd == CMD_CMDS) {
-            printf("Valid commands:\n");
+            printf("\nValid commands:\n");
             printf("[%c]: ATTACK the opponent!\n", CMD_ATK);
             printf("[%c]: HEAL your pokemon by using a potion!\n", CMD_HEAL);
             printf("[%c]: CHECK your party's stats!\n", CMD_STATS);
             printf("[%c]: CHECK your opponent's stats!\n", CMD_OPP);
-            printf("[%c]: VIEW valid commands!\n", CMD_CMDS);
+            printf("[%c]: VIEW commands!\n\n", CMD_CMDS);
         
             // Invalid Command 
         } else {
             printf("Unknown command: %c\n", cmd);
         }
 
-        // Opponent attacks!
+        // Opponent's turn!
         if (cmd == CMD_ATK || cmd == CMD_HEAL) {
-            own[INDEX_HP] -= dmg_taken;
-            printf("Opponent attacked! Your current pokemon has %d hp\n\n", own[INDEX_HP]);
+            if (opp[INDEX_STATUS] == STATUS_FRO) {
+                // if opponent is frozen, misses a turn
+                if (frozen > 0) {
+                    frozen--;
+                    printf("Opponent is frozen!\n");
+                } else {
+                    opp[INDEX_STATUS] = STATUS_NOR;
+                }
+            } else if (opp[INDEX_STATUS] == STATUS_SLE) {
+                // if opponent is sleeping, misses a turn
+                if (sleeping > 0) {
+                    sleeping--;
+                    printf("Opponent is sleeping!\n");
+                } else {
+                    opp[INDEX_STATUS] = STATUS_NOR;
+                }
+            } else {
+                if (opp[INDEX_STATUS] = STATUS_POI) {
+                    // if opponent is poisoned, will take 2 damage
+                    if (poisoned > 0) {
+                        printf("Opponent is poisoned! Took 2 damage!\n");
+                        opp[INDEX_HP] -= 2; 
+                        poisoned--; 
+                        printf("Opposing pokemon now has %d HP!\n\n", opp[INDEX_HP]);
+                        if (opp[INDEX_HP] <= 0) {
+                            printf("Opponent has fainted!\n");
+                            printf("CONGRATULATIONS!! YOU HAVE DEFEATED ALL OF YOUR OPPONENTS!!\n");
+                            printf("YOU ARE NOW THE NEW POKEMON CHAMPION!!\n");
+                            return 0;
+                        }
+                    } else {
+                        opp[INDEX_STATUS] = STATUS_NOR;
+                    }
+                }
 
-            if (own[INDEX_HP] <= 0) {
-                printf("Current pokemon has fainted!\n");
-                lost = true;
+                // Opponent attacks!
+                own[INDEX_HP] -= dmg_taken;
+                printf("Opponent attacked! Your current pokemon has %d HP!\n\n", own[INDEX_HP]);
+
+                if (own[INDEX_HP] <= 0) {
+                    printf("Current pokemon has fainted!\n");
+                    lost = true;
+                }
             }
         }
 
@@ -293,8 +415,8 @@ int main(void) {
     }
 
     if (lost) {
-        printf("Your entire party has fainted!\n");
-        printf("Game Over!\n");
+        printf("Your pokemom fainted!\n");
+        printf("Game Over! You'll get become champion next time!\n");
     }
     return 0;
 }
