@@ -370,6 +370,7 @@ int main(void) {
                     frozen--;
                     printf("Opponent is frozen!\n");
                 } else {
+                    printf("Opponent is no longer frozen!\n");
                     opp[INDEX_STATUS] = STATUS_NOR;
                 }
             } else if (opp[INDEX_STATUS] == STATUS_SLE) {
@@ -378,10 +379,12 @@ int main(void) {
                     sleeping--;
                     printf("Opponent is sleeping!\n");
                 } else {
+                    printf("Opponent is no longer sleeping!\n");
                     opp[INDEX_STATUS] = STATUS_NOR;
                 }
-            } else {
-                if (opp[INDEX_STATUS] = STATUS_POI) {
+            } 
+            if (opp[INDEX_STATUS] == STATUS_NOR || opp[INDEX_STATUS] == STATUS_POI) {
+                if (opp[INDEX_STATUS] == STATUS_POI) {
                     // if opponent is poisoned, will take 2 damage
                     if (poisoned > 0) {
                         printf("Opponent is poisoned! Took 2 damage!\n");
@@ -395,6 +398,7 @@ int main(void) {
                             return 0;
                         }
                     } else {
+                        printf("Opponent is no longer poisoned!\n");
                         opp[INDEX_STATUS] = STATUS_NOR;
                     }
                 }
