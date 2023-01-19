@@ -150,9 +150,9 @@ int main(void) {
     // Print current pokemon details
     printf("\n========================================\n");
     printf("Your pokemon: \n");
-    printf("HP:  %d\n", opp[INDEX_HP]);
-    printf("ATT: %d\n", opp[INDEX_ATT]);
-    printf("DEF: %d\n", opp[INDEX_DEF]);
+    printf("HP:  %d\n", own[INDEX_HP]);
+    printf("ATT: %d\n", own[INDEX_ATT]);
+    printf("DEF: %d\n", own[INDEX_DEF]);
     printf("TYPE: ");
     if (own[INDEX_TYPE] == FIRE_VALUE) {
         printf("FIRE\n");
