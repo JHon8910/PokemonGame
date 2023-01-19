@@ -12,7 +12,7 @@
 
 int main(void) {
     // Begin game
-    
+
     // STEP 1
     // TODO: INSERT WELCOME MESSAGE HERE
     
@@ -71,7 +71,7 @@ int main(void) {
     // Scan commands
     // MAY NEED TO EDIT WHILE LOOP CONDITION FOR WIN/LOSE CONDITION
     char cmd;
-    while (scanf(" %c", &cmd) !== EOF) { // Repeatedly scans for commands
+    while (scanf(" %c", &cmd) !== EOF) { // Repeatedly scans for commands until ctrl + d is pressed
         // STEP 7
         // TODO: ATTACK OPPONENT + OPPONENT ATTACKS USER
         if (cmd == CMD_ATK) {
